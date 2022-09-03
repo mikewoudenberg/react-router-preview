@@ -4,6 +4,7 @@ import {
   LoaderFunctionArgs,
   redirect,
   useLoaderData,
+  useNavigate,
 } from "react-router-dom";
 import { ContactType } from "../../server/models/Contact";
 import { getContact, updateContact } from "../contacts";
@@ -25,6 +26,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function Edit() {
   // TODO types break down here
   const contact = useLoaderData() as ContactType;
+  const navigate = useNavigate();
+
+  const handleCancel = () => {
+    navigate(-1);
+  };
 
   return (
     <Form method="post" id="contact-form">
@@ -70,7 +76,9 @@ export default function Edit() {
       </label>
       <p>
         <button type="submit">Save</button>
-        <button type="button">Cancel</button>
+        <button type="button" onClick={handleCancel}>
+          Cancel
+        </button>
       </p>
     </Form>
   );
