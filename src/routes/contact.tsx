@@ -10,7 +10,11 @@ import { getContact, updateContact } from "../contacts";
 
 // TODO type refinement possible here?
 export async function loader({ params }: LoaderFunctionArgs) {
-  return getContact(params.contactId || "");
+  const contact = await getContact(params.contactId || "");
+  if (!contact) {
+    throw new Response("", { status: 404, statusText: "Not found" });
+  }
+  return contact;
 }
 
 export async function action({ params, request }: ActionFunctionArgs) {
