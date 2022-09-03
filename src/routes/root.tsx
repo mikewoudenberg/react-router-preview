@@ -1,5 +1,6 @@
 import { Form, Link, Outlet, useLoaderData } from "react-router-dom";
-import { Contact, createContact, getContacts } from "../contacts";
+import { ContactType } from "../../server/models/Contact";
+import { createContact, getContacts } from "../contacts";
 
 export async function loader() {
   const contacts = await getContacts();
@@ -12,7 +13,7 @@ export async function action() {
 
 export default function Root() {
   // TODO types break down here
-  const { contacts } = useLoaderData() as { contacts: Array<Contact> };
+  const { contacts } = useLoaderData() as { contacts: Array<ContactType> };
 
   return (
     <>

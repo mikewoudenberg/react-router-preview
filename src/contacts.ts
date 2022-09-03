@@ -1,87 +1,55 @@
-import localforage from "localforage";
 import { matchSorter } from "match-sorter";
 import { sortBy } from "sort-by-typescript";
+import { ContactType } from "../server/models/Contact";
 
-export type Contact = {
-  favorite: boolean;
-  id: string;
-  createdAt: number;
-  first?: string;
-  last?: string;
-};
-
-export async function getContacts(query?: any) {
-  await fakeNetwork(`getContacts:${query}`);
-  let contacts = await localforage.getItem<Array<Contact>>("contacts");
-  if (!contacts) contacts = [];
+export async function getContacts(query?: string): Promise<Array<ContactType>> {
+  let contacts = await fetch("/api/contacts").then((res) => res.json());
   if (query) {
     contacts = matchSorter(contacts, query, { keys: ["first", "last"] });
   }
   return contacts.sort(sortBy("last", "createdAt"));
 }
 
-export async function createContact() {
-  await fakeNetwork();
+export async function createContact(): Promise<ContactType> {
   let id = Math.random().toString(36).substring(2, 9);
-  let contact: Contact = { id, createdAt: Date.now() };
-  let contacts = await getContacts();
-  contacts.unshift(contact);
-  await set(contacts);
-  return contact;
+  let contact: ContactType = { id, createdAt: Date.now() };
+  const createdContact = await fetch("/api/contacts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(contact),
+  }).then((res) => res.json());
+  return createdContact;
 }
 
-export async function getContact(id: string) {
-  await fakeNetwork(`contact:${id}`);
-  let contacts = await getContactsFromStorage();
-  let contact = contacts?.find((contact) => contact.id === id);
+export async function getContact(id: string): Promise<ContactType | null> {
+  let contact = await fetch(`/api/contacts/${id}`).then((res) => res.json());
   return contact ?? null;
 }
 
-export async function updateContact(id: string, updates: Partial<Contact>) {
-  await fakeNetwork();
-  let contacts = await getContactsFromStorage();
-  let contact = contacts?.find((contact) => contact.id === id);
-  if (!contacts || !contact) {
+export async function updateContact(
+  id: string,
+  updates: Partial<ContactType>
+): Promise<ContactType> {
+  const contact = await getContact(id);
+  if (!contact) {
     throw new Error(`No contact found for ${id}`);
   }
-  Object.assign(contact, updates);
-  await set(contacts);
-  return contact;
+
+  const updatedContact = { ...contact, ...updates };
+
+  await fetch(`/api/contacts/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updatedContact),
+  });
+
+  return updatedContact;
 }
 
 export async function deleteContact(id: string) {
-  let contacts = await getContactsFromStorage();
-  let index = contacts?.findIndex((contact) => contact.id === id);
-  if (contacts && index !== undefined && index > -1) {
-    contacts.splice(index, 1);
-    await set(contacts);
-    return true;
-  }
-  return false;
-}
-
-function getContactsFromStorage() {
-  return localforage.getItem<Array<Contact>>("contacts");
-}
-
-function set(contacts: Array<Contact>) {
-  return localforage.setItem("contacts", contacts);
-}
-
-// fake a cache so we don't slow down stuff we've already seen
-let fakeCache = {};
-
-async function fakeNetwork(key?: string) {
-  if (!key) {
-    fakeCache = {};
-  }
-
-  if (fakeCache[key]) {
-    return;
-  }
-
-  fakeCache[key] = true;
-  return new Promise((res) => {
-    setTimeout(res, Math.random() * 800);
+  await fetch(`/api/contacts/${id}`, {
+    method: "DELETE",
   });
+
+  return true;
 }

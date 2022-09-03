@@ -1,14 +1,15 @@
-import { Form } from "react-router-dom";
+import { Form, Params, useLoaderData } from "react-router-dom";
+import { ContactType } from "../../server/models/Contact";
+import { getContact } from "../contacts";
+
+// TODO type refinemnt possible here?
+export async function loader({ params }: { params: Params }) {
+  return getContact(params.contactId || "");
+}
 
 export default function Contact() {
-  const contact = {
-    first: "Your",
-    last: "Name",
-    avatar: "https://placekitten.com/g/200/200",
-    twitter: "your_handle",
-    notes: "Some notes",
-    favorite: true,
-  };
+  // TODO types break down here
+  const contact = useLoaderData() as ContactType;
 
   return (
     <div id="contact">
@@ -59,7 +60,7 @@ export default function Contact() {
   );
 }
 
-function Favorite({ contact }) {
+function Favorite({ contact }: { contact: ContactType }) {
   // yes, this is a `let` for later
   let favorite = contact.favorite;
   return (

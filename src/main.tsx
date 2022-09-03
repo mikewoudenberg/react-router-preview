@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { DataBrowserRouter, Route } from "react-router-dom";
 import ErrorPage from "./error-page";
 import "./index.css";
-import Contact from "./routes/contact";
+import Contact, { loader as contactLoader } from "./routes/contact";
 import Root, {
   action as rootAction,
   loader as rootLoader,
@@ -23,6 +23,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           path="contacts/:contactId"
           element={<Contact />}
           errorElement={<ErrorPage />}
+          loader={contactLoader}
         />
       </Route>
     </DataBrowserRouter>
