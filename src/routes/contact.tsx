@@ -1,15 +1,24 @@
 import {
+  ActionFunctionArgs,
   Form,
   LoaderFunctionArgs,
-  Params,
+  useFetcher,
   useLoaderData,
 } from "react-router-dom";
 import { ContactType } from "../../server/models/Contact";
-import { getContact } from "../contacts";
+import { getContact, updateContact } from "../contacts";
 
-// TODO type refinemnt possible here?
+// TODO type refinement possible here?
 export async function loader({ params }: LoaderFunctionArgs) {
   return getContact(params.contactId || "");
+}
+
+export async function action({ params, request }: ActionFunctionArgs) {
+  let formData = await request.formData();
+  // TODO types break down here
+  return updateContact(params.contactId || "", {
+    favorite: formData.get("favorite") === "true" ? true : false,
+  });
 }
 
 export default function Contact() {
@@ -66,10 +75,11 @@ export default function Contact() {
 }
 
 function Favorite({ contact }: { contact: ContactType }) {
+  const fetcher = useFetcher();
   // yes, this is a `let` for later
   let favorite = contact.favorite;
   return (
-    <Form method="post">
+    <fetcher.Form method="post">
       <button
         name="favorite"
         value={favorite ? "false" : "true"}
@@ -77,6 +87,6 @@ function Favorite({ contact }: { contact: ContactType }) {
       >
         {favorite ? "★" : "☆"}
       </button>
-    </Form>
+    </fetcher.Form>
   );
 }
