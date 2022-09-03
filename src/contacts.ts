@@ -2,9 +2,17 @@ import localforage from "localforage";
 import { matchSorter } from "match-sorter";
 import { sortBy } from "sort-by-typescript";
 
-export async function getContacts(query) {
+export type Contact = {
+  favorite: boolean;
+  id: string;
+  createdAt: number;
+  first?: string;
+  last?: string;
+};
+
+export async function getContacts(query?: any) {
   await fakeNetwork(`getContacts:${query}`);
-  let contacts = await localforage.getItem("contacts");
+  let contacts = await localforage.getItem<Array<Contact>>("contacts");
   if (!contacts) contacts = [];
   if (query) {
     contacts = matchSorter(contacts, query, { keys: ["first", "last"] });
@@ -15,34 +23,36 @@ export async function getContacts(query) {
 export async function createContact() {
   await fakeNetwork();
   let id = Math.random().toString(36).substring(2, 9);
-  let contact = { id, createdAt: Date.now() };
+  let contact: Contact = { id, createdAt: Date.now() };
   let contacts = await getContacts();
   contacts.unshift(contact);
   await set(contacts);
   return contact;
 }
 
-export async function getContact(id) {
+export async function getContact(id: string) {
   await fakeNetwork(`contact:${id}`);
-  let contacts = await localforage.getItem("contacts");
-  let contact = contacts.find((contact) => contact.id === id);
+  let contacts = await getContactsFromStorage();
+  let contact = contacts?.find((contact) => contact.id === id);
   return contact ?? null;
 }
 
-export async function updateContact(id, updates) {
+export async function updateContact(id: string, updates: Partial<Contact>) {
   await fakeNetwork();
-  let contacts = await localforage.getItem("contacts");
-  let contact = contacts.find((contact) => contact.id === id);
-  if (!contact) throw new Error("No contact found for", id);
+  let contacts = await getContactsFromStorage();
+  let contact = contacts?.find((contact) => contact.id === id);
+  if (!contacts || !contact) {
+    throw new Error(`No contact found for ${id}`);
+  }
   Object.assign(contact, updates);
   await set(contacts);
   return contact;
 }
 
-export async function deleteContact(id) {
-  let contacts = await localforage.getItem("contacts");
-  let index = contacts.findIndex((contact) => contact.id === id);
-  if (index > -1) {
+export async function deleteContact(id: string) {
+  let contacts = await getContactsFromStorage();
+  let index = contacts?.findIndex((contact) => contact.id === id);
+  if (contacts && index !== undefined && index > -1) {
     contacts.splice(index, 1);
     await set(contacts);
     return true;
@@ -50,14 +60,18 @@ export async function deleteContact(id) {
   return false;
 }
 
-function set(contacts) {
+function getContactsFromStorage() {
+  return localforage.getItem<Array<Contact>>("contacts");
+}
+
+function set(contacts: Array<Contact>) {
   return localforage.setItem("contacts", contacts);
 }
 
 // fake a cache so we don't slow down stuff we've already seen
 let fakeCache = {};
 
-async function fakeNetwork(key) {
+async function fakeNetwork(key?: string) {
   if (!key) {
     fakeCache = {};
   }

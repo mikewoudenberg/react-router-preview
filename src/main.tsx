@@ -4,12 +4,17 @@ import { DataBrowserRouter, Route } from "react-router-dom";
 import ErrorPage from "./error-page";
 import "./index.css";
 import Contact from "./routes/contact";
-import Root from "./routes/root";
+import Root, { loader as rootLoader } from "./routes/root";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <DataBrowserRouter>
-      <Route path="/" element={<Root />} errorElement={<ErrorPage />}>
+      <Route
+        path="/"
+        element={<Root />}
+        errorElement={<ErrorPage />}
+        loader={rootLoader}
+      >
         <Route
           path="contacts/:contactId"
           element={<Contact />}
