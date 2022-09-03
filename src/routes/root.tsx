@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import {
   Form,
   LoaderFunctionArgs,
@@ -12,8 +13,8 @@ import { createContact, getContacts } from "../contacts";
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const query = url.searchParams.get("q");
-  const contacts = await getContacts(query);
-  return { contacts };
+  const contacts = await getContacts(query || "");
+  return { contacts, query };
 }
 
 export async function action() {
@@ -22,8 +23,17 @@ export async function action() {
 
 export default function Root() {
   // TODO types break down here
-  const { contacts } = useLoaderData() as { contacts: Array<ContactType> };
+  const { contacts, query } = useLoaderData() as {
+    contacts: Array<ContactType>;
+    query: string | null;
+  };
   const navigation = useNavigation();
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (ref.current && query !== null) {
+      ref.current.value = query;
+    }
+  }, [query]);
 
   return (
     <>
@@ -32,11 +42,13 @@ export default function Root() {
         <div>
           <Form id="search-form" role="search">
             <input
+              ref={ref}
               id="q"
               aria-label="Search contacts"
               placeholder="Search"
               type="search"
               name="q"
+              defaultValue={query || ""}
             />
             <div id="search-spinner" aria-hidden hidden={true} />
             <div className="sr-only" aria-live="polite"></div>
