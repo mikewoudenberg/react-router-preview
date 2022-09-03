@@ -4,6 +4,7 @@ import { DataBrowserRouter, Route } from "react-router-dom";
 import ErrorPage from "./error-page";
 import "./index.css";
 import Contact, { loader as contactLoader } from "./routes/contact";
+import Edit, { action as editAction } from "./routes/edit";
 import Root, {
   action as rootAction,
   loader as rootLoader,
@@ -24,6 +25,12 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           element={<Contact />}
           errorElement={<ErrorPage />}
           loader={contactLoader}
+        />
+        <Route
+          path="contacts/:contactId/edit"
+          element={<Edit />}
+          loader={contactLoader}
+          action={editAction}
         />
       </Route>
     </DataBrowserRouter>

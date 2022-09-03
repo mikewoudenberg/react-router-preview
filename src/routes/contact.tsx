@@ -1,9 +1,14 @@
-import { Form, Params, useLoaderData } from "react-router-dom";
+import {
+  Form,
+  LoaderFunctionArgs,
+  Params,
+  useLoaderData,
+} from "react-router-dom";
 import { ContactType } from "../../server/models/Contact";
 import { getContact } from "../contacts";
 
 // TODO type refinemnt possible here?
-export async function loader({ params }: { params: Params }) {
+export async function loader({ params }: LoaderFunctionArgs) {
   return getContact(params.contactId || "");
 }
 
