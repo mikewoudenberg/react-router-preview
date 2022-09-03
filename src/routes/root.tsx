@@ -6,6 +6,7 @@ import {
   Outlet,
   useLoaderData,
   useNavigation,
+  useSubmit,
 } from "react-router-dom";
 import { ContactType } from "../../server/models/Contact";
 import { createContact, getContacts } from "../contacts";
@@ -27,8 +28,14 @@ export default function Root() {
     contacts: Array<ContactType>;
     query: string | null;
   };
+  const submit = useSubmit();
   const navigation = useNavigation();
+  const searching =
+    navigation.location &&
+    new URLSearchParams(navigation.location.search).has("q");
+
   const ref = useRef<HTMLInputElement>(null);
+  // TODO seems to be an opportunity to create a "Query Synced field" hook
   useEffect(() => {
     if (ref.current && query !== null) {
       ref.current.value = query;
@@ -45,12 +52,16 @@ export default function Root() {
               ref={ref}
               id="q"
               aria-label="Search contacts"
+              className={searching ? "loading" : ""}
               placeholder="Search"
               type="search"
               name="q"
               defaultValue={query || ""}
+              onChange={(event) => {
+                submit(event.currentTarget.form);
+              }}
             />
-            <div id="search-spinner" aria-hidden hidden={true} />
+            <div id="search-spinner" aria-hidden hidden={!searching} />
             <div className="sr-only" aria-live="polite"></div>
           </Form>
           <Form method="post">
