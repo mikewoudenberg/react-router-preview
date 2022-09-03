@@ -23,23 +23,23 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         element={<Root />}
         errorElement={<ErrorPage />}
         loader={rootLoader}
-        action={rootAction}
       >
-        <Route index element={<Index />} />
-        <Route
-          path="contacts/:contactId"
-          element={<Contact />}
-          errorElement={<ErrorPage />}
-          loader={contactLoader}
-          action={contactAction}
-        />
-        <Route
-          path="contacts/:contactId/edit"
-          element={<Edit />}
-          loader={contactLoader}
-          action={editAction}
-        />
-        <Route path="contacts/:contactId/destroy" action={destroyAction} />
+        <Route errorElement={<ErrorPage />} action={rootAction}>
+          <Route index element={<Index />} />
+          <Route
+            path="contacts/:contactId"
+            element={<Contact />}
+            loader={contactLoader}
+            action={contactAction}
+          />
+          <Route
+            path="contacts/:contactId/edit"
+            element={<Edit />}
+            loader={contactLoader}
+            action={editAction}
+          />
+          <Route path="contacts/:contactId/destroy" action={destroyAction} />
+        </Route>
       </Route>
     </DataBrowserRouter>
   </React.StrictMode>
