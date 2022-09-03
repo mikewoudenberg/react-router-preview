@@ -4,6 +4,7 @@ import { DataBrowserRouter, Route } from "react-router-dom";
 import ErrorPage from "./error-page";
 import "./index.css";
 import Contact, { loader as contactLoader } from "./routes/contact";
+import { action as destroyAction } from "./routes/destroy";
 import Edit, { action as editAction } from "./routes/edit";
 import Root, {
   action as rootAction,
@@ -32,6 +33,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           loader={contactLoader}
           action={editAction}
         />
+        <Route path="contacts/:contactId/destroy" action={destroyAction} />
       </Route>
     </DataBrowserRouter>
   </React.StrictMode>
