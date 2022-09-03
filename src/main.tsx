@@ -4,7 +4,10 @@ import { DataBrowserRouter, Route } from "react-router-dom";
 import ErrorPage from "./error-page";
 import "./index.css";
 import Contact from "./routes/contact";
-import Root, { loader as rootLoader } from "./routes/root";
+import Root, {
+  action as rootAction,
+  loader as rootLoader,
+} from "./routes/root";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
@@ -14,6 +17,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         element={<Root />}
         errorElement={<ErrorPage />}
         loader={rootLoader}
+        action={rootAction}
       >
         <Route
           path="contacts/:contactId"

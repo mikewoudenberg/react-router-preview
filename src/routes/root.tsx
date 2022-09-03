@@ -1,14 +1,19 @@
-import { Link, Outlet, useLoaderData } from "react-router-dom";
-import { Contact, getContacts } from "../contacts";
+import { Form, Link, Outlet, useLoaderData } from "react-router-dom";
+import { Contact, createContact, getContacts } from "../contacts";
 
 export async function loader() {
   const contacts = await getContacts();
   return { contacts };
 }
 
+export async function action() {
+  await createContact();
+}
+
 export default function Root() {
   // TODO types break down here
   const { contacts } = useLoaderData() as { contacts: Array<Contact> };
+
   return (
     <>
       <div id="sidebar">
@@ -25,9 +30,9 @@ export default function Root() {
             <div id="search-spinner" aria-hidden hidden={true} />
             <div className="sr-only" aria-live="polite"></div>
           </form>
-          <form method="post">
+          <Form method="post">
             <button type="submit">New</button>
-          </form>
+          </Form>
         </div>
         <nav>
           {contacts.length ? (
