@@ -93,6 +93,9 @@ export default function Root() {
                   </NavLink>
                 </li>
               ))}
+              <li>
+                <NavLink to="all-contacts">All</NavLink>
+              </li>
             </ul>
           ) : (
             <p>

@@ -8,6 +8,7 @@ import Contact, {
   action as contactAction,
   loader as contactLoader,
 } from "./routes/contact";
+import { Contacts } from "./routes/contacts";
 import { action as destroyAction } from "./routes/destroy";
 import Edit, { action as editAction } from "./routes/edit";
 import Root, {
@@ -23,6 +24,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         element={<Root />}
         errorElement={<ErrorPage />}
         loader={rootLoader}
+        id="root"
       >
         <Route errorElement={<ErrorPage />} action={rootAction}>
           <Route index element={<Index />} />
@@ -39,6 +41,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
             action={editAction}
           />
           <Route path="contacts/:contactId/destroy" action={destroyAction} />
+          <Route path="all-contacts" element={<Contacts />} />
         </Route>
       </Route>
     </DataBrowserRouter>
